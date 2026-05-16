@@ -1,0 +1,113 @@
+<div class="dashboard-wrapper">
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a routerLink="/dashboard" class="navbar-brand gradient-text">
+      💸 SpendSmart
+    </a>
+
+    <div class="nav-links">
+      <ng-container *ngIf="!authService.isAdmin()">
+        <a routerLink="/dashboard/expenses" routerLinkActive="active" id="nav-expenses">📋 Expenses</a>
+        <a routerLink="/dashboard/incomes" routerLinkActive="active" id="nav-incomes">💰 Incomes</a>
+        <a routerLink="/dashboard/add-expense" routerLinkActive="active" id="nav-add-expense">➕ Add Expense</a>
+        <a routerLink="/dashboard/add-income" routerLinkActive="active" id="nav-add-income">💵 Add Income</a>
+        <a routerLink="/dashboard/add-budget" routerLinkActive="active" id="nav-add-budget">🎯 Add Budget</a>
+        <a routerLink="/dashboard/reports" routerLinkActive="active" id="nav-reports">📊 Reports</a>
+      </ng-container>
+      <a *ngIf="authService.isAdmin()" routerLink="/dashboard/admin" routerLinkActive="active" id="nav-admin">⚙️ Admin</a>
+
+      <!-- System Status (Admin/Dev view) -->
+      <div class="system-status" style="display: flex; gap: 0.25rem; margin: 0 1rem;">
+        <div *ngFor="let entry of serviceStatus | keyvalue" 
+          [title]="entry.key + ': ' + entry.value"
+          [style.background]="entry.value === 'online' ? '#10b981' : (entry.value === 'offline' ? '#ef4444' : '#f59e0b')"
+          style="width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 8px rgba(0,0,0,0.5);">
+        </div>
+      </div>
+
+      <div style="height: 24px; width: 1px; background: var(--border-light); margin: 0 0.5rem;"></div>
+      
+      <a routerLink="/dashboard/profile" style="text-decoration: none; cursor: pointer;">
+        <span style="font-size: 0.9rem; color: var(--text-secondary); margin-right: 0.5rem; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-secondary)'">
+          👋 Hello, <strong style="color: var(--text-main);">{{ authService.getUserName() }}</strong>
+        </span>
+      </a>
+
+      <!-- Notifications Bell (User Only) -->
+      <div *ngIf="!authService.isAdmin()" class="notif-bell" style="position: relative; margin-left: 0.5rem;">
+        <button id="notif-bell-btn" (click)="toggleNotifications()"
+          style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-light); border-radius: 10px; width: 40px; height: 40px; cursor: pointer; color: white; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; position: relative;"
+        >
+          🔔
+          <span *ngIf="notifications.length > 0"
+            style="position: absolute; top: -4px; right: -4px; background: #ef4444; color: white; font-size: 0.65rem; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; border: 2px solid var(--bg-dark);">
+            {{ notifications.length > 9 ? '9+' : notifications.length }}
+          </span>
+        </button>
+
+        <!-- Notification Dropdown -->
+        <div *ngIf="showNotifications" class="notif-dropdown glass-panel" style="position: absolute; right: 0; top: calc(100% + 8px); width: 320px; padding: 0; border-radius: 16px; z-index: 2000; overflow: hidden; animation: slideDown 0.2s ease;">
+          <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+            <h4 style="font-size: 0.9rem; font-weight: 700; margin: 0;">Notifications</h4>
+            <span *ngIf="notifications.length > 0" class="badge badge-danger">{{ notifications.length }}</span>
+          </div>
+          <div *ngIf="notifications.length === 0" style="padding: 2rem; text-align: center; color: var(--text-secondary);">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔕</div>
+            <p style="font-size: 0.9rem;">No new notifications</p>
+          </div>
+          <div *ngFor="let notif of notifications" style="padding: 0.875rem 1.25rem; border-bottom: 1px solid var(--border-light);">
+            <div style="font-weight: 600; font-size: 0.875rem; color: #fca5a5; margin-bottom: 0.25rem;">{{ notif.title }}</div>
+            <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">{{ notif.message }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <div class="dashboard-grid" [class.admin-layout]="authService.isAdmin()">
+      <!-- Left: Router Content -->
+      <div class="content-area">
+        <router-outlet></router-outlet>
+      </div>
+
+      <!-- Right: Budget Sidebar (User Only) -->
+      <aside *ngIf="!authService.isAdmin()" class="sidebar-area">
+        <app-budget-status></app-budget-status>
+      </aside>
+    </div>
+  </main>
+
+  <!-- ===== Budget Alert Toast Stack ===== -->
+  <div class="toast-stack" *ngIf="toasts.length > 0">
+    <div
+      *ngFor="let toast of toasts"
+      class="budget-toast"
+      [class.toast-warning]="toast.type === 'warning'"
+      [class.toast-danger]="toast.type === 'danger'"
+    >
+      <div class="toast-icon">
+        {{ toast.type === 'danger' ? '🚨' : '⚠️' }}
+      </div>
+      <div class="toast-body">
+        <div class="toast-title">
+          {{ toast.type === 'danger' ? 'Budget Limit Reached!' : '80% Budget Used!' }}
+        </div>
+        <div class="toast-msg">
+          <strong>{{ toast.categoryName }}</strong>:
+          {{ toast.type === 'danger'
+            ? 'You\'ve hit 100% of your budget. No limit remaining!'
+            : toast.percent + '% of your budget is used. Slow down your spending!' }}
+        </div>
+        <div class="toast-progress-bar">
+          <div
+            class="toast-progress-fill"
+            [style.width.%]="toast.percent > 100 ? 100 : toast.percent"
+          ></div>
+        </div>
+      </div>
+      <button class="toast-close" (click)="removeToast(toast.id)" title="Dismiss">✕</button>
+    </div>
+  </div>
+</div>

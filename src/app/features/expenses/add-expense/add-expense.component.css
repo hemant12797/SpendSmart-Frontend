@@ -1,0 +1,71 @@
+/* ── Budget Info Box ─────────────────────────────────────────────────── */
+.budget-info-box {
+  margin-top: 0.6rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-size: 0.82rem;
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.3s ease;
+}
+
+.budget-ok {
+  background: rgba(56, 213, 169, 0.08);
+  border-color: rgba(56, 213, 169, 0.35);
+}
+
+.budget-warning {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: rgba(255, 193, 7, 0.45);
+}
+
+.budget-danger {
+  background: rgba(255, 107, 107, 0.1);
+  border-color: rgba(255, 107, 107, 0.45);
+}
+
+.budget-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.45rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.budget-remaining-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Progress bar */
+.budget-progress-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin-bottom: 0.45rem;
+}
+
+.budget-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.fill-ok      { background: linear-gradient(90deg, #38d5a9, #43e97b); }
+.fill-warning { background: linear-gradient(90deg, #f7971e, #ffc107); }
+.fill-danger  { background: linear-gradient(90deg, #ff6b6b, #ee0979); }
+
+.budget-info-row {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

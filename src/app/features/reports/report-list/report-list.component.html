@@ -1,0 +1,73 @@
+<div class="fade-in">
+  <div class="flex-between mb-3">
+    <div>
+      <h2 class="page-title" style="margin: 0;">📊 Reports</h2>
+      <p class="page-subtitle">Analyze your spending patterns</p>
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+      <button *ngIf="reports.length > 0" (click)="clearHistory()" class="btn-danger" style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; padding: 0.6rem 1rem;">
+        🗑️ Clear History
+      </button>
+      <button id="generate-report-btn" (click)="generateMonthlyReport()" class="btn-primary" [disabled]="generating">
+        <span *ngIf="!generating">⚡ Generate Monthly Report</span>
+        <span *ngIf="generating" style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="spinner" style="width: 16px; height: 16px; border-width: 2px;"></span> Generating...
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="reports.length === 0" class="glass-panel empty-state">
+    <div class="empty-state-icon">📊</div>
+    <h3>No reports yet</h3>
+    <p>Generate your first monthly report to see spending insights!</p>
+    <button (click)="generateMonthlyReport()" class="btn-primary" style="margin-top: 1.5rem;" [disabled]="generating">
+      ⚡ Generate Report
+    </button>
+  </div>
+
+  <!-- Reports Grid -->
+  <div *ngIf="reports.length > 0" style="display: grid; gap: 1rem;">
+    <div *ngFor="let report of reports" class="glass-panel" style="padding: 1.5rem;">
+      <div class="flex-between">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+            <span style="font-size: 1.5rem;">📄</span>
+            <div>
+              <h3 style="font-size: 1rem; font-weight: 700; margin: 0; color: var(--text-main);">{{ report.title }}</h3>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.2rem 0 0;">
+                Generated {{ report.generatedAt | date:'MMM d, y, h:mm a' }}
+              </p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1.5rem; margin-top: 0.75rem;">
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">Type</div>
+              <span class="badge badge-primary">{{ report.reportType }}</span>
+            </div>
+            <div *ngIf="report.totalExpenses">
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">Total Expenses</div>
+              <div style="font-weight: 700; color: var(--danger);">{{ report.totalExpenses | currency:'INR':'symbol':'1.0-0' }}</div>
+            </div>
+            <div *ngIf="report.transactionCount">
+              <div style="font-size: 0.75rem; color: var(--text-secondary);">Transactions</div>
+              <div style="font-weight: 700; color: var(--primary-light);">{{ report.transactionCount }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+          <span class="badge badge-success">{{ report.status || 'READY' }}</span>
+          <button (click)="downloadReport(report.id || report.reportId || report.ReportId)" class="btn-secondary btn-sm">
+            ⬇️ Download
+          </button>
+          <button (click)="deleteReport(report.id || report.reportId || report.ReportId)" class="btn-icon" style="color: var(--danger); opacity: 0.8;" title="Delete Report">
+            🗑️
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

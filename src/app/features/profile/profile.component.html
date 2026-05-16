@@ -1,0 +1,99 @@
+<div class="fade-in" style="max-width: 600px; margin: 0 auto;">
+  <div class="flex-between mb-3">
+    <div>
+      <h2 class="page-title" style="margin: 0;">👤 My Profile</h2>
+      <p class="page-subtitle">Manage your account details</p>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="glass-panel loading-state">
+    <div class="spinner"></div>
+    <p>Loading profile...</p>
+  </div>
+
+  <div *ngIf="error" class="glass-panel empty-state">
+    <div class="empty-state-icon">⚠️</div>
+    <h3>Error</h3>
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="!loading && userProfile" class="glass-panel" style="padding: 2rem;">
+    
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div style="width: 100px; height: 100px; border-radius: 50%; background: var(--primary-light); color: white; display: inline-flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; margin-bottom: 1rem; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);">
+        {{ userProfile.fullName ? userProfile.fullName.charAt(0).toUpperCase() : (userProfile.email.charAt(0).toUpperCase()) }}
+      </div>
+      <h3 style="margin: 0; font-size: 1.5rem; color: var(--text-main);">{{ userProfile.fullName || 'User' }}</h3>
+      <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary);">{{ userProfile.role }}</p>
+    </div>
+
+    <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+      <!-- Email (Read Only) -->
+      <div class="form-group" style="margin: 0;">
+        <label class="form-label">Email Address</label>
+        <div class="form-input" style="background: rgba(255,255,255,0.02); display: flex; align-items: center;">
+          {{ userProfile.email }}
+        </div>
+      </div>
+      
+      <!-- Currency (Editable) -->
+      <div class="form-group" style="margin: 0;">
+        <label class="form-label">Preferred Currency <span style="color: var(--text-secondary); font-size: 0.85rem; margin-left: 0.5rem;">(Current: {{ userProfile.currency }})</span></label>
+        <div style="display: flex; gap: 0.5rem;">
+          <select [(ngModel)]="userProfile.currency" class="form-input" style="flex: 1;">
+            <option *ngFor="let c of currencies" [value]="c">{{ c }}</option>
+          </select>
+          <button (click)="updateCurrency()" class="btn-primary" [disabled]="isSavingCurrency">
+            {{ isSavingCurrency ? 'Saving...' : 'Update' }}
+          </button>
+        </div>
+        <div *ngIf="currencyMessage" style="color: #34d399; font-size: 0.85rem; margin-top: 0.25rem;">
+          {{ currencyMessage }}
+        </div>
+      </div>
+
+      <!-- Account Created (Read Only) -->
+      <div class="form-group" style="margin: 0;">
+        <label class="form-label">Account Created</label>
+        <div class="form-input" style="background: rgba(255,255,255,0.02); display: flex; align-items: center;">
+          {{ userProfile.createdAt | date:'longDate' }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Change Password Section -->
+    <div style="border-top: 1px solid var(--border-light); padding-top: 1.5rem; margin-bottom: 2rem;">
+      <h4 style="margin: 0 0 1rem 0; color: var(--text-main);">Change Password</h4>
+      
+      <div style="display: grid; gap: 1rem;">
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label">Current Password</label>
+          <input type="password" [(ngModel)]="passwordData.currentPassword" class="form-input" placeholder="Enter current password" />
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label">New Password</label>
+          <input type="password" [(ngModel)]="passwordData.newPassword" class="form-input" placeholder="Enter new password" />
+        </div>
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label">Confirm New Password</label>
+          <input type="password" [(ngModel)]="passwordData.confirmPassword" class="form-input" placeholder="Confirm new password" />
+        </div>
+        
+        <div *ngIf="passwordError" style="color: #ef4444; font-size: 0.85rem;">{{ passwordError }}</div>
+        <div *ngIf="passwordMessage" style="color: #34d399; font-size: 0.85rem;">{{ passwordMessage }}</div>
+
+        <button (click)="changePassword()" class="btn-primary" [disabled]="isSavingPassword || !passwordData.currentPassword || !passwordData.newPassword">
+          {{ isSavingPassword ? 'Updating...' : 'Change Password' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Logout -->
+    <div style="border-top: 1px solid var(--border-light); padding-top: 1.5rem; display: flex; justify-content: center;">
+      <button (click)="logout()" class="btn-danger" style="width: 100%; justify-content: center; padding: 1rem; font-size: 1.1rem; border-radius: 12px;">
+        🚪 Sign Out
+      </button>
+    </div>
+
+  </div>
+</div>

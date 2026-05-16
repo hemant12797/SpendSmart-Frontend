@@ -1,0 +1,96 @@
+<div class="fade-in">
+  <div class="flex-between mb-3">
+    <div>
+      <h2 class="page-title" style="margin: 0;">💵 Add Income</h2>
+      <p class="page-subtitle">Record your earnings and cash inflow</p>
+    </div>
+  </div>
+
+  <div class="glass-panel" style="max-width: 600px;">
+    <div *ngIf="successMsg" class="alert alert-success">✅ {{ successMsg }}</div>
+    <div *ngIf="errorMsg" class="alert alert-error">⚠️ {{ errorMsg }}</div>
+
+    <form [formGroup]="incomeForm" (ngSubmit)="onSubmit()">
+      <!-- Amount -->
+      <div class="form-group">
+        <label class="form-label" for="inc-amount">Amount (₹)</label>
+        <div style="position: relative;">
+          <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-weight: 600; font-size: 1rem;">₹</span>
+          <input
+            id="inc-amount"
+            type="number"
+            formControlName="amount"
+            class="form-input"
+            placeholder="0.00"
+            min="0.01"
+            step="0.01"
+            style="padding-left: 2.5rem;"
+          >
+        </div>
+        <div *ngIf="incomeForm.get('amount')?.touched && incomeForm.get('amount')?.invalid" class="form-error">
+          ⚠ Please enter a valid amount greater than 0
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label class="form-label" for="inc-desc">Description</label>
+        <input
+          id="inc-desc"
+          type="text"
+          formControlName="description"
+          class="form-input"
+          placeholder="e.g. March Salary"
+        >
+        <div *ngIf="incomeForm.get('description')?.touched && incomeForm.get('description')?.invalid" class="form-error">
+          ⚠ Description is required
+        </div>
+      </div>
+
+      <!-- Source & Date Row -->
+      <div class="grid-2" style="gap: 1rem;">
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" for="inc-source">Source</label>
+          <select id="inc-source" formControlName="source" class="form-input">
+            <option value="SALARY">💼 Salary</option>
+            <option value="FREELANCE">💻 Freelance</option>
+            <option value="INVESTMENT">📈 Investment</option>
+            <option value="RENTAL">🏠 Rental</option>
+            <option value="OTHER">🔄 Other</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" for="inc-date">Date</label>
+          <input
+            id="inc-date"
+            type="date"
+            formControlName="date"
+            class="form-input"
+          >
+          <div *ngIf="incomeForm.get('date')?.touched && incomeForm.get('date')?.invalid" class="form-error">
+            ⚠ Date is required
+          </div>
+        </div>
+      </div>
+
+      <!-- Recurring -->
+      <div class="form-group" style="margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <input type="checkbox" id="inc-recurring" formControlName="isRecurring" style="width: 1.2rem; height: 1.2rem; accent-color: var(--primary);">
+        <label for="inc-recurring" class="form-label" style="margin: 0; cursor: pointer;">This is a recurring income</label>
+      </div>
+
+      <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+        <button id="add-income-submit" type="submit" class="btn-primary" [disabled]="incomeForm.invalid || submitting" style="flex: 1; justify-content: center; background: linear-gradient(135deg, #10b981, #059669);">
+          <span *ngIf="!submitting">💾 Save Income</span>
+          <span *ngIf="submitting" style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="spinner" style="width: 16px; height: 16px; border-width: 2px;"></span> Saving...
+          </span>
+        </button>
+        <button type="button" class="btn-secondary" (click)="resetForm()" style="padding: 0.75rem 1.25rem;">
+          🔄 Reset
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

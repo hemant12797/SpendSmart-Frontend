@@ -1,0 +1,68 @@
+<div class="glass-panel" style="padding: 1.5rem;">
+  <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+    🎯 Budget Status
+  </h3>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state" style="padding: 1.5rem;">
+    <div class="spinner" style="width: 28px; height: 28px;"></div>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!loading && budgets.length === 0" class="empty-state" style="padding: 1.5rem;">
+    <div class="empty-state-icon" style="font-size: 2rem;">💰</div>
+    <h3 style="font-size: 0.9rem;">No budgets set</h3>
+    <p style="font-size: 0.8rem;">Contact admin to set budgets</p>
+  </div>
+
+  <!-- Budget Items -->
+  <div *ngFor="let budget of budgets; let last = last" [style.margin-bottom]="last ? '0' : '1.25rem'">
+    <div class="flex-between mb-1">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span style="font-size: 0.875rem; font-weight: 600; color: var(--text-main);">{{ budget.categoryName || 'General' }}</span>
+        <button type="button" (click)="onDelete(budget.id)" class="btn-icon" style="color: var(--danger); opacity: 0.6; cursor: pointer; background: none; border: none; font-size: 0.9rem;" title="Delete Budget">
+          🗑️
+        </button>
+      </div>
+      <span style="font-size: 0.8rem; color: var(--text-secondary);">
+        {{ budget.spentAmount | currency:'INR':'symbol':'1.0-0' }} / {{ budget.limitAmount | currency:'INR':'symbol':'1.0-0' }}
+      </span>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-track">
+      <div
+        class="progress-fill"
+        [style.width.%]="getPercentage(budget.spentAmount, budget.limitAmount)"
+        [style.background]="getProgressBarColor(budget.spentAmount, budget.limitAmount)"
+      ></div>
+    </div>
+
+    <!-- Percentage & status -->
+    <div class="flex-between mt-1">
+      <span style="font-size: 0.75rem; color: var(--text-secondary);">
+        {{ getPercentage(budget.spentAmount, budget.limitAmount) | number:'1.0-0' }}% used
+      </span>
+      <span class="badge"
+        [class]="getPercentage(budget.spentAmount, budget.limitAmount) >= 100 ? 'badge-danger' : getPercentage(budget.spentAmount, budget.limitAmount) >= 80 ? 'badge-warning' : 'badge-success'"
+        style="font-size: 0.7rem; padding: 0.15rem 0.5rem;"
+      >
+        {{ getPercentage(budget.spentAmount, budget.limitAmount) >= 100 ? '🚨 Over limit' : getPercentage(budget.spentAmount, budget.limitAmount) >= 80 ? '⚠️ High' : '✅ OK' }}
+      </span>
+    </div>
+
+    <div *ngIf="!last" class="divider" style="margin: 1rem 0 0;"></div>
+  </div>
+
+  <!-- Summary -->
+  <div *ngIf="!loading && budgets.length > 0" style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-light);">
+    <div class="flex-between">
+      <span style="font-size: 0.8rem; color: var(--text-secondary);">Total Spent</span>
+      <span style="font-size: 0.9rem; font-weight: 700; color: var(--danger);">{{ totalSpent | currency:'INR':'symbol':'1.0-0' }}</span>
+    </div>
+    <div class="flex-between mt-1">
+      <span style="font-size: 0.8rem; color: var(--text-secondary);">Total Budget</span>
+      <span style="font-size: 0.9rem; font-weight: 700; color: var(--accent);">{{ totalBudget | currency:'INR':'symbol':'1.0-0' }}</span>
+    </div>
+  </div>
+</div>

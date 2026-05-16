@@ -1,0 +1,109 @@
+<div class="fade-in">
+  <!-- Header -->
+  <div class="flex-between mb-3">
+    <div>
+      <h2 class="page-title" style="margin: 0;">💰 My Incomes</h2>
+      <p class="page-subtitle">Track and manage all your earnings</p>
+    </div>
+    <a routerLink="/dashboard/add-income" class="btn-primary btn-sm" style="text-decoration: none; background: linear-gradient(135deg, #10b981, #059669);">
+      ➕ Add New
+    </a>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="glass-panel loading-state">
+    <div class="spinner"></div>
+    <p>Loading incomes...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && incomes.length === 0" class="glass-panel empty-state">
+    <div class="empty-state-icon">💵</div>
+    <h3>No incomes yet</h3>
+    <p>Start adding your earnings to track your cash flow!</p>
+    <a routerLink="/dashboard/add-income" class="btn-primary" style="margin-top: 1.5rem; text-decoration: none; display: inline-flex; background: linear-gradient(135deg, #10b981, #059669);">
+      ➕ Add Your First Income
+    </a>
+  </div>
+
+  <!-- Income Table -->
+  <div *ngIf="!loading && incomes.length > 0" class="glass-panel" style="padding: 0; overflow: hidden;">
+    <!-- Stats Row -->
+    <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-light); display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+      <div style="text-align: center;">
+        <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary-light);">{{ incomes.length }}</div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary);">Total Entries</div>
+      </div>
+      <div style="text-align: center;">
+        <div style="font-size: 1.5rem; font-weight: 800; color: #10b981;">{{ totalAmount | currency:'INR':'symbol':'1.0-0' }}</div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary);">Total Earnings</div>
+      </div>
+    </div>
+
+    <!-- Filter Row -->
+    <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-light); display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <button (click)="setFilter('all')" [class]="filter === 'all' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'">All</button>
+      <button (click)="setFilter('today')" [class]="filter === 'today' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'">Today</button>
+      <button (click)="setFilter('month')" [class]="filter === 'month' ? 'btn-primary btn-sm' : 'btn-secondary btn-sm'">This Month</button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Source</th>
+            <th>Description</th>
+            <th>Recurring</th>
+            <th style="text-align: right;">Amount</th>
+            <th style="text-align: center; width: 60px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let income of filteredIncomes">
+            <td>
+              <span style="color: var(--text-secondary); font-size: 0.85rem;">
+                {{ income.date | date:'MMM d, y' }}
+              </span>
+            </td>
+            <td>
+              <span class="badge badge-success">{{ income.source }}</span>
+            </td>
+            <td>
+              <span style="font-weight: 500;">{{ income.description }}</span>
+            </td>
+            <td>
+              <span *ngIf="income.isRecurring" title="Recurring" style="font-size: 1.2rem;">🔄</span>
+              <span *ngIf="!income.isRecurring" style="color: var(--border-light);">-</span>
+            </td>
+            <td style="text-align: right;">
+              <span style="font-weight: 700; color: #10b981; font-size: 1rem;">
+                +{{ income.amount | currency:'INR':'symbol':'1.2-2' }}
+              </span>
+            </td>
+            <td style="text-align: center;">
+              <button 
+                (click)="deleteIncome(income.incomeId)" 
+                class="btn-icon" 
+                style="background: transparent; border: none; cursor: pointer; padding: 0.25rem; border-radius: 4px; transition: background 0.2s;"
+                onmouseover="this.style.background='rgba(239,68,68,0.1)'"
+                onmouseout="this.style.background='transparent'"
+                title="Delete Income"
+              >
+                🗑️
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- No results after filter -->
+    <div *ngIf="filteredIncomes.length === 0 && incomes.length > 0" class="empty-state" style="padding: 2rem;">
+      <div class="empty-state-icon">🔍</div>
+      <h3>No incomes found</h3>
+      <p>Try changing the filter</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,133 @@
+<div class="auth-page">
+  <!-- Animated background orbs -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <div class="auth-card glass-panel fade-in">
+    <!-- Logo & Header -->
+    <div class="auth-header">
+      <div class="auth-logo">
+        <span class="logo-icon">💸</span>
+      </div>
+      <h1 class="gradient-text" style="font-size: 2rem; font-weight: 800; margin-bottom: 0.25rem;">SpendSmart</h1>
+      <p class="text-secondary" style="font-size: 0.95rem;">Welcome back! Sign in to your account</p>
+    </div>
+
+    <!-- Error Alert -->
+    <div *ngIf="errorMessage" class="alert alert-error">
+      ⚠️ {{ errorMessage }}
+    </div>
+
+    <!-- Google Sign-In Button -->
+    <div id="google-btn" style="margin-bottom: 1rem; width: 100%; display: flex; justify-content: center;"></div>
+    
+    <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
+      <div style="flex: 1; height: 1px; background: var(--border-light);"></div>
+      <span style="padding: 0 1rem; color: var(--text-secondary); font-size: 0.85rem; font-weight: 500;">OR</span>
+      <div style="flex: 1; height: 1px; background: var(--border-light);"></div>
+    </div>
+
+    <!-- Login Type Toggle -->
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; padding: 0.25rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid var(--border-light);">
+      <button 
+        type="button"
+        style="flex: 1; padding: 0.75rem; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.9rem;"
+        [style.background]="!isAdminLogin ? 'var(--primary)' : 'transparent'"
+        [style.color]="!isAdminLogin ? 'white' : 'var(--text-secondary)'"
+        (click)="setLoginType(false)">
+        👤 User
+      </button>
+      <button 
+        type="button"
+        style="flex: 1; padding: 0.75rem; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.9rem;"
+        [style.background]="isAdminLogin ? 'var(--primary)' : 'transparent'"
+        [style.color]="isAdminLogin ? 'white' : 'var(--text-secondary)'"
+        (click)="setLoginType(true)">
+        ⚙️ Admin
+      </button>
+    </div>
+
+    <!-- Login Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label class="form-label" for="login-email">Email Address</label>
+        <input
+          id="login-email"
+          type="email"
+          formControlName="email"
+          class="form-input"
+          placeholder="you@example.com"
+          autocomplete="email"
+        >
+        <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" class="form-error">
+          ⚠ Please enter a valid email address
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="login-password">Password</label>
+        <div style="position: relative;">
+          <input
+            id="login-password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            class="form-input"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            style="padding-right: 3rem;"
+          >
+          <button
+            type="button"
+            (click)="togglePassword()"
+            style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary); font-size: 1rem;"
+          >
+            {{ showPassword ? '🙈' : '👁️' }}
+          </button>
+        </div>
+        <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="form-error">
+          ⚠ Password is required
+        </div>
+      </div>
+
+      <div class="form-group" *ngIf="isAdminLogin" style="animation: fade-in 0.3s ease-out;">
+        <label class="form-label" for="login-passkey">Admin Passkey</label>
+        <input
+          id="login-passkey"
+          type="password"
+          formControlName="passkey"
+          class="form-input"
+          placeholder="Enter admin passkey (spend@admin)"
+        >
+        <div *ngIf="loginForm.get('passkey')?.touched && loginForm.get('passkey')?.invalid" class="form-error">
+          ⚠ Passkey is required for Admin login
+        </div>
+      </div>
+
+      <button
+        id="login-submit-btn"
+        type="submit"
+        class="btn-primary w-full"
+        style="justify-content: center; margin-top: 0.5rem; padding: 1rem; font-size: 1rem; animation: pulse-glow 3s ease-in-out infinite;"
+        [disabled]="loginForm.invalid || isLoading"
+      >
+        <span *ngIf="!isLoading">Sign In →</span>
+        <span *ngIf="isLoading" style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="spinner" style="width: 18px; height: 18px; border-width: 2px;"></span>
+          Signing in...
+        </span>
+      </button>
+    </form>
+
+    <div class="divider"></div>
+
+    <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
+      Don't have an account?
+      <a id="go-to-register" href="javascript:void(0)" (click)="navigateToRegister()"
+        style="color: var(--primary-light); font-weight: 600; text-decoration: none; margin-left: 0.25rem; transition: color 0.2s;"
+        onmouseover="this.style.color='var(--accent-light)'"
+        onmouseout="this.style.color='var(--primary-light)'"
+      >Create one free</a>
+    </p>
+  </div>
+</div>
